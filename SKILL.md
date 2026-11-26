@@ -28,7 +28,8 @@ Pule o que o aluno já informou. Envie as perguntas numeradas e curtas e espere 
 5. Quais as cores (em hex) e as fontes? Ou ele usa a identidade de uma marca?
 6. Tem logo, imagens ou vídeos para usar? Peça para anexar.
 7. Terá áudio? Sem áudio, ou com trilha ou locução que o aluno anexa.
-8. Tem alguma referência visual?
+8. Quer efeitos sonoros (SFX) no motion? Sim ou não. Se sim, eles entram junto com o preview da Etapa 2.
+9. Tem alguma referência visual?
 
 Regras das respostas:
 - Números, nomes e dados que aparecem no motion vêm do aluno. Nunca invente.
@@ -60,13 +61,15 @@ Só começa depois da aprovação explícita da Etapa 1.
 1. Dê movimento às cenas aprovadas. **Não altere layout, cores, fontes, posições finais ou textos aprovados.** Mudança de estética exige voltar à Etapa 1 para a cena afetada.
 2. Aplique as regras de movimento abaixo.
 3. Confira 4 quadros com `npx remotion still` (início, meio, fim e o trecho mais denso): texto fora do lugar, elemento visível antes de entrar ou depois de sair, saltos. Corrija antes de mostrar.
-4. Entregue o preview com o Remotion Player (`@remotion/player`), com play, pause e linha do tempo.
-5. Escreva uma mensagem curta com uma frase do que ele está vendo e pergunte se aprova a animação ou quer ajustes.
+4. Se o aluno quis efeitos sonoros, adicione os SFX antes de entregar o preview (veja "Efeitos sonoros" abaixo).
+5. Entregue o preview com o Remotion Player (`@remotion/player`), com play, pause e linha do tempo, tocando o áudio junto com a animação.
+6. Escreva uma mensagem curta com uma frase do que ele está vendo. Se houver efeitos sonoros, diga quais 4 ou 5 momentos ele deve conferir com fone. Pergunte se aprova a animação e o som ou quer ajustes.
 
 Ajustes da Etapa 2:
 - Aplique só o que o aluno pediu e não mexa no resto.
 - Se o pedido for vago, pergunte qual elemento e o que mudar.
 - Depois de cada ajuste, repita a conferência de quadros e atualize o preview.
+- Pedidos de som (trocar, tirar, abaixar ou mudar o momento de um efeito) também entram aqui.
 - Repita até o aluno aprovar.
 
 Não gere MP4 nesta etapa, nem para conferir.
@@ -82,6 +85,20 @@ Não gere MP4 nesta etapa, nem para conferir.
 - **Quadro puro:** cada quadro é função pura do tempo. Sem `Math.random` sem seed, sem transição de CSS, sem timer. Todo tempo derivado do fps.
 - **Proibido:** easing elástico sem motivo, explosão de partículas genérica, lens flare, tempo morto, cara de template.
 
+### Efeitos sonoros (só se o aluno pediu)
+
+- Só sons reais. Nunca sintetize som no código (oscilador, WebAudio, numpy): fica genérico e infantil.
+- Fontes, nesta ordem:
+  1. **Openverse** (https://openverse.org), só licença `cc0`. O Claude não acessa o Openverse sozinho. Use o Claude in Chrome no computador do aluno: abra `https://api.openverse.org/v1/audio/?q=<busca>`, baixe as prévias em MP3, junte tudo em um único zip com os créditos, pergunte "Posso baixar?" e peça que o aluno envie o zip para a conversa. A saída do `javascript_tool` é curta (cerca de 1 KB): guarde os dados em `window` e nunca passe áudio em base64 pela saída. Não funciona no celular. Se o aluno não tiver a extensão, avise e siga com as outras fontes.
+  2. **Real SFX** (https://github.com/Clipwing/skills/tree/main/skills/real-sfx): rode `git clone https://github.com/Clipwing/skills` e siga o README para encaixar cada som no quadro exato e conferir sincronia, variedade e volume.
+  3. **Earshot** (https://github.com/Leonxlnx/earshot): `pip install "earshot @ git+https://github.com/Leonxlnx/earshot"`. Gera sons de gravações em domínio público, offline. Use para o que o Openverse não tiver: toques, pops, sucção, moeda.
+- Se alguma fonte não estiver acessível, diga qual e siga com as outras. Nunca invente o som.
+- Salve os áudios em `public/sfx/` e toque com o componente de áudio do Remotion dentro de `<Sequence from={quadro}>`, para o preview e o MP4 usarem exatamente o mesmo som.
+- Encaixe cada som no quadro da ação: pops nas entradas, whoosh nas transições (pico no corte), clique nos botões, impacto baixo nos destaques. Varie o arquivo, nunca repita o mesmo som em sequência.
+- Volume: efeitos bem abaixo da locução (cerca de 9 dB) e ainda mais baixos enquanto a voz fala. Sem locução, mantenha os efeitos discretos.
+- Você não ouve o áudio. Sempre liste os 4 ou 5 momentos que o aluno deve conferir com fone.
+- Guarde os créditos das licenças e entregue junto com o motion.
+
 ### Estilo explicativo (videoaulas)
 Se o aluno escolher o estilo explicativo, textos e elementos entram e ficam parados. Sem órbita, flutuação, tremido ou rotação. Sem glow e sem blur nos textos.
 
@@ -90,6 +107,7 @@ Se o aluno escolher o estilo explicativo, textos e elementos entram e ficam para
 - Só renderize quando o aluno pedir com clareza: "renderiza", "gera o MP4", "exporta o vídeo".
 - Se ele apenas aprovar a animação, responda: "Animação aprovada. Quer que eu renderize o MP4?" e espere.
 - Ao renderizar: `npx remotion render src/index.ts <Composicao> out/video.mp4 --codec h264 --crf 16 --overwrite`. Se o Remotion pedir um navegador, use o Chrome disponível no ambiente.
+- O MP4 sai com o mesmo áudio aprovado no preview (locução, trilha e efeitos sonoros).
 - Depois de renderizar, extraia 4 quadros do MP4 e confira antes de entregar.
 - Entregue o arquivo com uma linha de contexto.
 
